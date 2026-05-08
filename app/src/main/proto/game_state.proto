@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+option java_package = "com.orangezest.farkle.data.proto";
+option java_multiple_files = true;
+
+message SavedGameState {
+    int32 schema_version = 1;
+    string json_state = 2;
+}

@@ -93,8 +93,10 @@ dependencies {
     testRuntimeOnly(libs.junit5.engine)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.turbine)
+    testImplementation(kotlin("test"))
 }
 
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
