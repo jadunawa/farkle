@@ -23,7 +23,10 @@ fun ActionBar(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         if (canUndo) {
-            OutlinedButton(onClick = onUndo) {
+            OutlinedButton(
+                onClick = onUndo,
+                modifier = Modifier.height(56.dp),
+            ) {
                 Text("Undo")
             }
         }
@@ -34,7 +37,7 @@ fun ActionBar(
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFFD32F2F),
             ),
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).height(56.dp),
         ) {
             Text("Roll", color = Color.White)
         }
@@ -45,7 +48,7 @@ fun ActionBar(
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFF388E3C),
             ),
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).height(56.dp),
         ) {
             Text("Bank (+$bankAmount)", color = Color.White)
         }

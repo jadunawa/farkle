@@ -8,6 +8,8 @@ import com.orangezest.farkle.data.GameStateRepository
 import com.orangezest.farkle.data.PreferencesSettingsStore
 import com.orangezest.farkle.data.SettingsRepository
 import com.orangezest.farkle.data.SettingsStore
+import android.util.Log
+import com.orangezest.farkle.BuildConfig
 import com.orangezest.farkle.engine.DiceRoller
 import com.orangezest.farkle.engine.GameConfig
 import com.orangezest.farkle.engine.GameReducer
@@ -30,7 +32,15 @@ object GameModule {
 
     @Provides
     @Singleton
-    fun provideDiceRoller(): DiceRoller = SecureRandomDiceRoller()
+    fun provideDiceRoller(): DiceRoller {
+        val roller: DiceRoller = SecureRandomDiceRoller()
+        if (!BuildConfig.DEBUG) return roller
+        return DiceRoller { count ->
+            roller.roll(count).also { result ->
+                Log.d("DiceRoller", "Rolled $count dice: $result")
+            }
+        }
+    }
 
     @Provides
     @Singleton

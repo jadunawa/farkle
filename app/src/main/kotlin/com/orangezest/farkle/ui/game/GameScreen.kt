@@ -9,12 +9,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
 import com.orangezest.farkle.engine.*
+import kotlinx.coroutines.delay
 
 @Composable
 fun AdaptiveGameScreen(
     state: GameUiState,
     scoringEngine: ScoringEngine,
     onEvent: (GameEvent) -> Unit,
+    onNewGame: () -> Unit,
     windowWidthClass: WindowWidthSizeClass,
 ) {
     if (windowWidthClass == WindowWidthSizeClass.Expanded) {
@@ -29,6 +31,7 @@ fun AdaptiveGameScreen(
                 state = state,
                 scoringEngine = scoringEngine,
                 onEvent = onEvent,
+                onNewGame = onNewGame,
                 modifier = Modifier.weight(1f),
             )
         }
@@ -37,6 +40,7 @@ fun AdaptiveGameScreen(
             state = state,
             scoringEngine = scoringEngine,
             onEvent = onEvent,
+            onNewGame = onNewGame,
         )
     }
 }
@@ -46,6 +50,7 @@ fun GameScreen(
     state: GameUiState,
     scoringEngine: ScoringEngine,
     onEvent: (GameEvent) -> Unit,
+    onNewGame: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val rotationAngle = remember(state.currentPlayerIndex, state.players.size) {
@@ -64,6 +69,7 @@ fun GameScreen(
             players = state.players,
             currentPlayerIndex = state.currentPlayerIndex,
             minimumToBoard = state.config.minimumToBoard,
+            modifier = Modifier.rotate(rotationAngle),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -77,8 +83,13 @@ fun GameScreen(
         ) {
             when (val phase = state.turnPhase) {
                 is TurnPhase.WaitingToRoll -> {
-                    Button(onClick = { onEvent(GameEvent.RollDice) }) {
-                        Text("Roll Dice")
+                    Button(
+                        onClick = { onEvent(GameEvent.RollDice) },
+                        modifier = Modifier
+                            .fillMaxWidth(0.6f)
+                            .height(64.dp),
+                    ) {
+                        Text("Roll Dice", style = MaterialTheme.typography.titleLarge)
                     }
                 }
 
@@ -107,6 +118,7 @@ fun GameScreen(
                             phase = phase,
                             scoringEngine = scoringEngine,
                             onToggleDie = { onEvent(GameEvent.ToggleDie(it)) },
+                            diceKept = state.diceKept,
                         )
 
                         ActionBar(
@@ -129,10 +141,14 @@ fun GameScreen(
                 }
 
                 is TurnPhase.PassingDevice -> {
-                    PassDeviceScreen(
-                        nextPlayerName = state.players[(state.currentPlayerIndex + 1) % state.players.size].name,
-                        onReady = { onEvent(GameEvent.ReadyForTurn) },
+                    Text(
+                        text = "${state.currentPlayer.name}'s turn",
+                        style = MaterialTheme.typography.headlineMedium,
                     )
+                    LaunchedEffect(Unit) {
+                        delay(800)
+                        onEvent(GameEvent.ReadyForTurn)
+                    }
                 }
 
                 is TurnPhase.OfferSteal -> {
@@ -148,6 +164,7 @@ fun GameScreen(
                     GameOverScreen(
                         winner = state.players[phase.winnerIndex],
                         players = state.players,
+                        onNewGame = onNewGame,
                     )
                 }
             }

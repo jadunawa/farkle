@@ -59,6 +59,11 @@ fun FarkleNavGraph(
                 state = gameState,
                 scoringEngine = scoringEngine,
                 onEvent = onEvent,
+                onNewGame = {
+                    navController.navigate(Routes.SETUP) {
+                        popUpTo(Routes.GAME) { inclusive = true }
+                    }
+                },
                 windowWidthClass = windowWidthClass,
             )
         }

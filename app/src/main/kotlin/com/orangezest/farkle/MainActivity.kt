@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
+import com.orangezest.farkle.ui.components.UpdateDialog
 import com.orangezest.farkle.ui.navigation.FarkleNavGraph
 import com.orangezest.farkle.ui.theme.FarkleTheme
 import com.orangezest.farkle.viewmodel.GameViewModel
@@ -24,6 +25,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val windowSizeClass = calculateWindowSizeClass(this)
             FarkleTheme {
+                UpdateDialog()
                 val navController = rememberNavController()
                 val gameViewModel: GameViewModel = hiltViewModel()
                 val gameState by gameViewModel.uiState.collectAsStateWithLifecycle()

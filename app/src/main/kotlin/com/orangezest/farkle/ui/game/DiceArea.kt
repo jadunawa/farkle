@@ -15,6 +15,7 @@ fun DiceArea(
     phase: TurnPhase.SelectingDice,
     scoringEngine: ScoringEngine,
     onToggleDie: (Int) -> Unit,
+    diceKept: List<Int> = emptyList(),
     modifier: Modifier = Modifier,
 ) {
     val scoringOptions = scoringEngine.findScoringOptions(phase.rollResult)
@@ -25,6 +26,21 @@ fun DiceArea(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+        if (diceKept.isNotEmpty()) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                diceKept.forEach { value ->
+                    Die(
+                        value = value,
+                        state = DieState.LOCKED,
+                        onClick = {},
+                        modifier = Modifier.size(48.dp),
+                    )
+                }
+            }
+        }
+
         val rows = phase.rollResult.chunked(3)
         rows.forEachIndexed { rowIndex, row ->
             Row(

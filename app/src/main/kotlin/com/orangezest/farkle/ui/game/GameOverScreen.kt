@@ -13,6 +13,7 @@ import com.orangezest.farkle.engine.Player
 fun GameOverScreen(
     winner: Player,
     players: List<Player>,
+    onNewGame: () -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -36,6 +37,17 @@ fun GameOverScreen(
                 text = "${player.name}: ${player.totalScore}",
                 style = MaterialTheme.typography.bodyLarge,
             )
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Button(
+            onClick = onNewGame,
+            modifier = Modifier
+                .fillMaxWidth(0.8f)
+                .height(56.dp),
+        ) {
+            Text("New Game")
         }
     }
 }

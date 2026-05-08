@@ -32,6 +32,7 @@ fun PassDeviceScreen(
                 onClick = onSteal,
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
+                    .height(56.dp)
                     .padding(bottom = 12.dp),
             ) {
                 Text("Steal the roll (${offerSteal.previousTotal} pts, ${offerSteal.remainingDice} dice)")
@@ -39,14 +40,18 @@ fun PassDeviceScreen(
 
             Button(
                 onClick = onReady,
-                modifier = Modifier.fillMaxWidth(0.8f),
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .height(56.dp),
             ) {
                 Text("Start Fresh")
             }
         } else {
             Button(
                 onClick = onReady,
-                modifier = Modifier.fillMaxWidth(0.8f),
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .height(56.dp),
             ) {
                 Text("Ready")
             }
