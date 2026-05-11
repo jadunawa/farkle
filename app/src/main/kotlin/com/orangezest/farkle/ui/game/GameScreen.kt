@@ -141,8 +141,9 @@ fun GameScreen(
                 }
 
                 is TurnPhase.PassingDevice -> {
+                    val nextPlayerIndex = (state.currentPlayerIndex + 1) % state.players.size
                     Text(
-                        text = "${state.currentPlayer.name}'s turn",
+                        text = "${state.players[nextPlayerIndex].name}'s turn",
                         style = MaterialTheme.typography.headlineMedium,
                     )
                     LaunchedEffect(Unit) {
