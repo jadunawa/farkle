@@ -12,6 +12,18 @@ android {
     namespace = "com.orangezest.farkle"
     compileSdk = 35
 
+    signingConfigs {
+        getByName("debug") {
+            val keystorePath = findProperty("ci.keystorePath") as? String
+            if (keystorePath != null) {
+                storeFile = file(keystorePath)
+                storePassword = findProperty("ci.keystorePassword") as? String
+                keyAlias = "farkle-debug"
+                keyPassword = findProperty("ci.keystorePassword") as? String
+            }
+        }
+    }
+
     defaultConfig {
         applicationId = "com.orangezest.farkle"
         minSdk = 33

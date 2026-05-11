@@ -27,8 +27,15 @@ jobs:
         if: ${{ !vars.ANDROID_RUNNER }}
         uses: android-actions/setup-android@v3
 
+      - name: Decode signing keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.DEBUG_KEYSTORE }}
+        run: echo "$KEYSTORE_BASE64" | base64 -d > "${{ runner.temp }}/debug.p12"
+
       - name: Build debug APK
-        run: gradle :app:assembleDebug -Pci.versionCode=${{ github.run_number }}
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.DEBUG_KEYSTORE_PASSWORD }}
+        run: gradle :app:assembleDebug -Pci.versionCode=${{ github.run_number }} "-Pci.keystorePath=${{ runner.temp }}/debug.p12" "-Pci.keystorePassword=$KEYSTORE_PASSWORD"
 
       - name: Rename APK
         run: mv app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/farkle-debug.apk
