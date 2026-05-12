@@ -7,6 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.unit.coerceIn
 import androidx.compose.ui.unit.dp
 import com.orangezest.farkle.engine.*
 import kotlinx.coroutines.delay
@@ -74,22 +75,29 @@ fun GameScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Box(
+        BoxWithConstraints(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
                 .rotate(rotationAngle),
             contentAlignment = Alignment.Center,
         ) {
+            val isAxisSwapped = rotationAngle == 90f || rotationAngle == 270f
+            val visualHeight = if (isAxisSwapped) maxWidth else maxHeight
+            val buttonHeight = (visualHeight * 0.09f).coerceIn(48.dp, 96.dp)
+            val ctaButtonHeight = (visualHeight * 0.12f).coerceIn(56.dp, 120.dp)
+            val dieSize = (visualHeight * 0.10f).coerceIn(48.dp, 96.dp)
+            val keptDieSize = (dieSize * 0.67f).coerceIn(36.dp, 64.dp)
+
             when (val phase = state.turnPhase) {
                 is TurnPhase.WaitingToRoll -> {
                     Button(
                         onClick = { onEvent(GameEvent.RollDice) },
                         modifier = Modifier
-                            .fillMaxWidth(0.6f)
-                            .height(64.dp),
+                            .fillMaxWidth(0.7f)
+                            .height(ctaButtonHeight),
                     ) {
-                        Text("Roll Dice", style = MaterialTheme.typography.titleLarge)
+                        Text("Roll Dice", style = MaterialTheme.typography.headlineSmall)
                     }
                 }
 
@@ -119,6 +127,8 @@ fun GameScreen(
                             scoringEngine = scoringEngine,
                             onToggleDie = { onEvent(GameEvent.ToggleDie(it)) },
                             diceKept = state.diceKept,
+                            dieSize = dieSize,
+                            keptDieSize = keptDieSize,
                         )
 
                         ActionBar(
@@ -129,6 +139,7 @@ fun GameScreen(
                             onBank = { onEvent(GameEvent.Bank) },
                             onUndo = { onEvent(GameEvent.Undo) },
                             canUndo = state.stateHistory.isNotEmpty(),
+                            buttonHeight = buttonHeight,
                         )
                     }
                 }
@@ -158,6 +169,7 @@ fun GameScreen(
                         offerSteal = phase,
                         onReady = { onEvent(GameEvent.StartFresh) },
                         onSteal = { onEvent(GameEvent.StealRoll(phase.remainingDice, phase.previousTotal)) },
+                        buttonHeight = buttonHeight,
                     )
                 }
 
@@ -166,6 +178,7 @@ fun GameScreen(
                         winner = state.players[phase.winnerIndex],
                         players = state.players,
                         onNewGame = onNewGame,
+                        buttonHeight = buttonHeight,
                     )
                 }
             }

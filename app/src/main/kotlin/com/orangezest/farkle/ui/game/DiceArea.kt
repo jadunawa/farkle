@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.orangezest.farkle.engine.ScoringEngine
 import com.orangezest.farkle.engine.TurnPhase
@@ -16,6 +17,8 @@ fun DiceArea(
     scoringEngine: ScoringEngine,
     onToggleDie: (Int) -> Unit,
     diceKept: List<Int> = emptyList(),
+    dieSize: Dp = 72.dp,
+    keptDieSize: Dp = 48.dp,
     modifier: Modifier = Modifier,
 ) {
     val scoringOptions = scoringEngine.findScoringOptions(phase.rollResult)
@@ -35,7 +38,7 @@ fun DiceArea(
                         value = value,
                         state = DieState.LOCKED,
                         onClick = {},
-                        modifier = Modifier.size(48.dp),
+                        modifier = Modifier.size(keptDieSize),
                     )
                 }
             }
@@ -61,6 +64,7 @@ fun DiceArea(
                         value = value,
                         state = state,
                         onClick = { onToggleDie(index) },
+                        modifier = Modifier.size(dieSize),
                     )
                 }
             }

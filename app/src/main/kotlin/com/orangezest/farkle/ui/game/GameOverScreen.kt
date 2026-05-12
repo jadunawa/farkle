@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.orangezest.farkle.engine.Player
 
@@ -14,6 +15,7 @@ fun GameOverScreen(
     winner: Player,
     players: List<Player>,
     onNewGame: () -> Unit,
+    buttonHeight: Dp = 72.dp,
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -45,9 +47,9 @@ fun GameOverScreen(
             onClick = onNewGame,
             modifier = Modifier
                 .fillMaxWidth(0.8f)
-                .height(56.dp),
+                .height(buttonHeight),
         ) {
-            Text("New Game")
+            Text("New Game", style = MaterialTheme.typography.titleMedium)
         }
     }
 }

@@ -5,6 +5,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -16,6 +17,7 @@ fun ActionBar(
     onBank: () -> Unit,
     onUndo: () -> Unit,
     canUndo: Boolean,
+    buttonHeight: Dp,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -25,9 +27,9 @@ fun ActionBar(
         if (canUndo) {
             OutlinedButton(
                 onClick = onUndo,
-                modifier = Modifier.height(56.dp),
+                modifier = Modifier.height(buttonHeight),
             ) {
-                Text("Undo")
+                Text("Undo", style = MaterialTheme.typography.titleMedium)
             }
         }
 
@@ -37,9 +39,9 @@ fun ActionBar(
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFFD32F2F),
             ),
-            modifier = Modifier.weight(1f).height(56.dp),
+            modifier = Modifier.weight(1f).height(buttonHeight),
         ) {
-            Text("Roll", color = Color.White)
+            Text("Roll", color = Color.White, style = MaterialTheme.typography.titleMedium)
         }
 
         Button(
@@ -48,9 +50,9 @@ fun ActionBar(
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFF388E3C),
             ),
-            modifier = Modifier.weight(1f).height(56.dp),
+            modifier = Modifier.weight(1f).height(buttonHeight),
         ) {
-            Text("Bank (+$bankAmount)", color = Color.White)
+            Text("Bank (+$bankAmount)", color = Color.White, style = MaterialTheme.typography.titleMedium)
         }
     }
 }
