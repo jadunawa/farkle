@@ -5,6 +5,34 @@ on:
     branches: [main]
 
 jobs:
+  commit-hygiene:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for AI co-author traces
+        shell: bash
+        run: |
+          FORBIDDEN=$(git log origin/main..HEAD --format="%B" | grep -iE "co-authored-by:.*(claude|anthropic|openai|copilot)" || true)
+          if [ -n "$FORBIDDEN" ]; then
+            echo "::error::AI co-author trace found in commit messages"
+            echo "$FORBIDDEN"
+            exit 1
+          fi
+
+      - name: Check commit author emails
+        shell: bash
+        env:
+          ALLOWED_EMAIL: "1733111+jadunawa@users.noreply.github.com"
+        run: |
+          BAD_EMAILS=$(git log origin/main..HEAD --format="%ae" | grep -v "$ALLOWED_EMAIL" | sort -u || true)
+          if [ -n "$BAD_EMAILS" ]; then
+            echo "::error::Commits from unauthorized email(s): $BAD_EMAILS"
+            exit 1
+          fi
+
   build-and-test:
     runs-on: ${{ vars.ANDROID_RUNNER || 'ubuntu-latest' }}
     steps:
