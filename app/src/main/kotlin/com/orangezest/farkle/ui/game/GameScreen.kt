@@ -19,6 +19,7 @@ fun AdaptiveGameScreen(
     onEvent: (GameEvent) -> Unit,
     onNewGame: () -> Unit,
     windowWidthClass: WindowWidthSizeClass,
+    diceStayInPlace: Boolean = true,
 ) {
     if (windowWidthClass == WindowWidthSizeClass.Expanded) {
         Row(modifier = Modifier.fillMaxSize().padding(16.dp)) {
@@ -33,6 +34,7 @@ fun AdaptiveGameScreen(
                 scoringEngine = scoringEngine,
                 onEvent = onEvent,
                 onNewGame = onNewGame,
+                diceStayInPlace = diceStayInPlace,
                 modifier = Modifier.weight(1f),
             )
         }
@@ -42,6 +44,7 @@ fun AdaptiveGameScreen(
             scoringEngine = scoringEngine,
             onEvent = onEvent,
             onNewGame = onNewGame,
+            diceStayInPlace = diceStayInPlace,
         )
     }
 }
@@ -52,6 +55,7 @@ fun GameScreen(
     scoringEngine: ScoringEngine,
     onEvent: (GameEvent) -> Unit,
     onNewGame: () -> Unit,
+    diceStayInPlace: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
     val rotationAngle = remember(state.currentPlayerIndex, state.players.size) {
@@ -86,8 +90,6 @@ fun GameScreen(
             val visualHeight = if (isAxisSwapped) maxWidth else maxHeight
             val buttonHeight = (visualHeight * 0.09f).coerceIn(48.dp, 96.dp)
             val ctaButtonHeight = (visualHeight * 0.12f).coerceIn(56.dp, 120.dp)
-            val dieSize = (visualHeight * 0.10f).coerceIn(48.dp, 96.dp)
-            val keptDieSize = (dieSize * 0.67f).coerceIn(36.dp, 64.dp)
 
             when (val phase = state.turnPhase) {
                 is TurnPhase.WaitingToRoll -> {
@@ -127,8 +129,7 @@ fun GameScreen(
                             scoringEngine = scoringEngine,
                             onToggleDie = { onEvent(GameEvent.ToggleDie(it)) },
                             diceKept = state.diceKept,
-                            dieSize = dieSize,
-                            keptDieSize = keptDieSize,
+                            diceStayInPlace = diceStayInPlace,
                         )
 
                         ActionBar(

@@ -55,6 +55,9 @@ fun FarkleNavGraph(
             )
         }
         composable(Routes.GAME) {
+            val settingsViewModel: SettingsViewModel = hiltViewModel()
+            val diceStayInPlace by settingsViewModel.diceStayInPlace.collectAsStateWithLifecycle()
+
             AdaptiveGameScreen(
                 state = gameState,
                 scoringEngine = scoringEngine,
@@ -65,6 +68,7 @@ fun FarkleNavGraph(
                     }
                 },
                 windowWidthClass = windowWidthClass,
+                diceStayInPlace = diceStayInPlace,
             )
         }
         composable(Routes.SETTINGS) {
