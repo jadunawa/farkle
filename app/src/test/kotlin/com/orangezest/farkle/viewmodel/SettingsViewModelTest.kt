@@ -52,4 +52,21 @@ class SettingsViewModelTest {
         vm.updateHapticEnabled(false)
         assertEquals(false, vm.hapticEnabled.first())
     }
+
+    @Test
+    fun `dice stay in place defaults to true`() = runTest {
+        val store = InMemorySettingsStore()
+        val repo = SettingsRepository(store)
+        val vm = SettingsViewModel(repo)
+        assertEquals(true, vm.diceStayInPlace.first())
+    }
+
+    @Test
+    fun `updating dice stay in place emits new value`() = runTest {
+        val store = InMemorySettingsStore()
+        val repo = SettingsRepository(store)
+        val vm = SettingsViewModel(repo)
+        vm.updateDiceStayInPlace(false)
+        assertEquals(false, vm.diceStayInPlace.first())
+    }
 }

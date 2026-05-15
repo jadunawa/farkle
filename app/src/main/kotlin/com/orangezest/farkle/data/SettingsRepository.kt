@@ -58,6 +58,10 @@ class SettingsRepository(private val store: SettingsStore) {
         prefs["theme_mode"] as? String ?: "system"
     }
 
+    val diceStayInPlace: Flow<Boolean> = store.settings.map { prefs ->
+        prefs["dice_stay_in_place"] as? Boolean ?: true
+    }
+
     suspend fun updateTargetScore(value: Int) = store.update("target_score", value)
     suspend fun updateMinimumToBoard(value: Int) = store.update("minimum_to_board", value)
     suspend fun updateHotDice(enabled: Boolean) = store.update("hot_dice", enabled)
@@ -65,4 +69,5 @@ class SettingsRepository(private val store: SettingsStore) {
     suspend fun updateSoundEnabled(enabled: Boolean) = store.update("sound_enabled", enabled)
     suspend fun updateHapticEnabled(enabled: Boolean) = store.update("haptic_enabled", enabled)
     suspend fun updateThemeMode(mode: String) = store.update("theme_mode", mode)
+    suspend fun updateDiceStayInPlace(enabled: Boolean) = store.update("dice_stay_in_place", enabled)
 }

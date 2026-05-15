@@ -55,6 +55,9 @@ fun FarkleNavGraph(
             )
         }
         composable(Routes.GAME) {
+            val settingsViewModel: SettingsViewModel = hiltViewModel()
+            val diceStayInPlace by settingsViewModel.diceStayInPlace.collectAsStateWithLifecycle()
+
             AdaptiveGameScreen(
                 state = gameState,
                 scoringEngine = scoringEngine,
@@ -65,6 +68,7 @@ fun FarkleNavGraph(
                     }
                 },
                 windowWidthClass = windowWidthClass,
+                diceStayInPlace = diceStayInPlace,
             )
         }
         composable(Routes.SETTINGS) {
@@ -73,6 +77,7 @@ fun FarkleNavGraph(
             val soundEnabled by settingsViewModel.soundEnabled.collectAsStateWithLifecycle()
             val hapticEnabled by settingsViewModel.hapticEnabled.collectAsStateWithLifecycle()
             val themeMode by settingsViewModel.themeMode.collectAsStateWithLifecycle()
+            val diceStayInPlace by settingsViewModel.diceStayInPlace.collectAsStateWithLifecycle()
 
             SettingsScreen(
                 config = config,
@@ -86,6 +91,8 @@ fun FarkleNavGraph(
                 onUpdateSoundEnabled = settingsViewModel::updateSoundEnabled,
                 onUpdateHapticEnabled = settingsViewModel::updateHapticEnabled,
                 onUpdateThemeMode = settingsViewModel::updateThemeMode,
+                diceStayInPlace = diceStayInPlace,
+                onUpdateDiceStayInPlace = settingsViewModel::updateDiceStayInPlace,
                 onBack = { navController.popBackStack() },
             )
         }

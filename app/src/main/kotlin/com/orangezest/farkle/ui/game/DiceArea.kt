@@ -4,8 +4,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import com.orangezest.farkle.engine.ScoringEngine
 import com.orangezest.farkle.engine.TurnPhase
 import com.orangezest.farkle.ui.components.Die
@@ -17,55 +17,137 @@ fun DiceArea(
     scoringEngine: ScoringEngine,
     onToggleDie: (Int) -> Unit,
     diceKept: List<Int> = emptyList(),
-    dieSize: Dp = 72.dp,
-    keptDieSize: Dp = 48.dp,
+    diceStayInPlace: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
     val scoringOptions = scoringEngine.findScoringOptions(phase.rollResult)
     val scorableFaces = scoringOptions.flatMap { it.diceUsed }.toSet()
 
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        if (diceKept.isNotEmpty()) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                diceKept.forEach { value ->
-                    Die(
-                        value = value,
-                        state = DieState.LOCKED,
-                        onClick = {},
-                        modifier = Modifier.size(keptDieSize),
-                    )
+    if (diceStayInPlace) {
+        DiceGridStayInPlace(
+            rollResult = phase.rollResult,
+            selectedIndices = phase.selectedIndices,
+            scorableFaces = scorableFaces,
+            diceKept = diceKept,
+            onToggleDie = onToggleDie,
+            modifier = modifier,
+        )
+    } else {
+        DiceGridSeparateKept(
+            rollResult = phase.rollResult,
+            selectedIndices = phase.selectedIndices,
+            scorableFaces = scorableFaces,
+            diceKept = diceKept,
+            onToggleDie = onToggleDie,
+            modifier = modifier,
+        )
+    }
+}
+
+@Composable
+private fun DiceGridStayInPlace(
+    rollResult: List<Int>,
+    selectedIndices: Set<Int>,
+    scorableFaces: Set<Int>,
+    diceKept: List<Int>,
+    onToggleDie: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val totalSlots = diceKept.size + rollResult.size
+    val rows = (0 until totalSlots).chunked(2)
+
+    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
+        val spacing = 12.dp
+        val dieSize = min((maxWidth - spacing) / 2, 160.dp)
+
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(spacing),
+        ) {
+            rows.forEach { slotIndices ->
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(spacing),
+                ) {
+                    slotIndices.forEach { slotIndex ->
+                        if (slotIndex < diceKept.size) {
+                            Die(
+                                value = diceKept[slotIndex],
+                                state = DieState.LOCKED,
+                                onClick = {},
+                                modifier = Modifier.size(dieSize),
+                            )
+                        } else {
+                            val rollIndex = slotIndex - diceKept.size
+                            val value = rollResult[rollIndex]
+                            val isSelected = rollIndex in selectedIndices
+                            val canScore = value in scorableFaces
+
+                            Die(
+                                value = value,
+                                state = if (isSelected) DieState.SELECTED else DieState.DEFAULT,
+                                onClick = { if (canScore || isSelected) onToggleDie(rollIndex) },
+                                modifier = Modifier.size(dieSize),
+                            )
+                        }
+                    }
                 }
             }
         }
+    }
+}
 
-        val rows = phase.rollResult.chunked(3)
-        rows.forEachIndexed { rowIndex, row ->
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                row.forEachIndexed { colIndex, value ->
-                    val index = rowIndex * 3 + colIndex
-                    val isSelected = index in phase.selectedIndices
-                    val canScore = value in scorableFaces
+@Composable
+private fun DiceGridSeparateKept(
+    rollResult: List<Int>,
+    selectedIndices: Set<Int>,
+    scorableFaces: Set<Int>,
+    diceKept: List<Int>,
+    onToggleDie: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
+        val spacing = 12.dp
+        val dieSize = min((maxWidth - spacing) / 2, 160.dp)
+        val keptDieSize = min(dieSize * 0.67f, 64.dp)
 
-                    val state = when {
-                        isSelected -> DieState.SELECTED
-                        !canScore -> DieState.DISABLED
-                        else -> DieState.DEFAULT
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(spacing),
+        ) {
+            if (diceKept.isNotEmpty()) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    diceKept.forEach { value ->
+                        Die(
+                            value = value,
+                            state = DieState.LOCKED,
+                            onClick = {},
+                            modifier = Modifier.size(keptDieSize),
+                        )
                     }
+                }
+            }
 
-                    Die(
-                        value = value,
-                        state = state,
-                        onClick = { onToggleDie(index) },
-                        modifier = Modifier.size(dieSize),
-                    )
+            val rows = rollResult.chunked(2)
+            rows.forEachIndexed { rowIndex, row ->
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(spacing),
+                ) {
+                    row.forEachIndexed { colIndex, value ->
+                        val index = rowIndex * 2 + colIndex
+                        val isSelected = index in selectedIndices
+                        val canScore = value in scorableFaces
+
+                        Die(
+                            value = value,
+                            state = if (isSelected) DieState.SELECTED else DieState.DEFAULT,
+                            onClick = { if (canScore || isSelected) onToggleDie(index) },
+                            modifier = Modifier.size(dieSize),
+                        )
+                    }
                 }
             }
         }

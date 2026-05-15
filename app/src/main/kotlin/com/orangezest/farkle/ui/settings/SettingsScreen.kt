@@ -27,6 +27,8 @@ fun SettingsScreen(
     onUpdateSoundEnabled: (Boolean) -> Unit,
     onUpdateHapticEnabled: (Boolean) -> Unit,
     onUpdateThemeMode: (String) -> Unit,
+    diceStayInPlace: Boolean,
+    onUpdateDiceStayInPlace: (Boolean) -> Unit,
     onBack: () -> Unit,
 ) {
     Scaffold(
@@ -56,6 +58,11 @@ fun SettingsScreen(
 
             SwitchRow("Hot Dice", config.hotDiceEnabled, onUpdateHotDice)
             SwitchRow("Piggybacking", config.piggybackingEnabled, onUpdatePiggybacking)
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+            Text("Gameplay", style = MaterialTheme.typography.titleMedium)
+
+            SwitchRow("Dice Stay in Place", diceStayInPlace, onUpdateDiceStayInPlace)
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             Text("Feedback", style = MaterialTheme.typography.titleMedium)
