@@ -4,6 +4,9 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: write
+
 jobs:
   commit-hygiene:
     runs-on: ubuntu-latest
@@ -61,11 +64,36 @@ jobs:
       - name: Lint
         run: gradle :app:lintDebug
 
+      - name: Decode signing keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.DEBUG_KEYSTORE }}
+        run: echo "$KEYSTORE_BASE64" | base64 -d > "${{ runner.temp }}/debug.p12"
+
       - name: Build debug APK
-        run: gradle :app:assembleDebug
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.DEBUG_KEYSTORE_PASSWORD }}
+          VERSION_CODE: ${{ github.run_number }}
+          KEYSTORE_PATH: ${{ runner.temp }}/debug.p12
+        run: gradle :app:assembleDebug -Pci.versionCode="$VERSION_CODE" "-Pci.keystorePath=$KEYSTORE_PATH" "-Pci.keystorePassword=$KEYSTORE_PASSWORD"
+
+      - name: Rename APK
+        run: mv app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/farkle-debug.apk
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
           name: debug-apk
-          path: app/build/outputs/apk/debug/*.apk
+          path: app/build/outputs/apk/debug/farkle-debug.apk
+
+      - name: Publish to debug-latest release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          if gh release view debug-latest >/dev/null 2>&1; then
+            gh release upload debug-latest app/build/outputs/apk/debug/farkle-debug.apk --clobber
+            gh release edit debug-latest --title "Debug Build #$RUN_NUMBER" --notes "$RUN_NUMBER"
+          else
+            gh release create debug-latest app/build/outputs/apk/debug/farkle-debug.apk \
+              --title "Debug Build #$RUN_NUMBER" --notes "$RUN_NUMBER" --prerelease
+          fi
