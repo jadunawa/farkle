@@ -28,6 +28,9 @@ class SettingsViewModel @Inject constructor(
     val themeMode: StateFlow<String> = repository.themeMode
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "system")
 
+    val diceStayInPlace: StateFlow<Boolean> = repository.diceStayInPlace
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
     fun updateTargetScore(value: Int) = viewModelScope.launch { repository.updateTargetScore(value) }
     fun updateMinimumToBoard(value: Int) = viewModelScope.launch { repository.updateMinimumToBoard(value) }
     fun updateHotDice(enabled: Boolean) = viewModelScope.launch { repository.updateHotDice(enabled) }
@@ -35,4 +38,5 @@ class SettingsViewModel @Inject constructor(
     fun updateSoundEnabled(enabled: Boolean) = viewModelScope.launch { repository.updateSoundEnabled(enabled) }
     fun updateHapticEnabled(enabled: Boolean) = viewModelScope.launch { repository.updateHapticEnabled(enabled) }
     fun updateThemeMode(mode: String) = viewModelScope.launch { repository.updateThemeMode(mode) }
+    fun updateDiceStayInPlace(enabled: Boolean) = viewModelScope.launch { repository.updateDiceStayInPlace(enabled) }
 }
