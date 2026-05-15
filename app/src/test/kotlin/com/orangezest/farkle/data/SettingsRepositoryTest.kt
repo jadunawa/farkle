@@ -45,4 +45,17 @@ class SettingsRepositoryTest {
         repo.updateHapticEnabled(false)
         assertFalse(repo.hapticEnabled.first())
     }
+
+    @Test
+    fun `dice stay in place defaults to true`() = runTest {
+        val repo = SettingsRepository(InMemorySettingsStore())
+        assertEquals(true, repo.diceStayInPlace.first())
+    }
+
+    @Test
+    fun `updates dice stay in place`() = runTest {
+        val repo = SettingsRepository(InMemorySettingsStore())
+        repo.updateDiceStayInPlace(false)
+        assertFalse(repo.diceStayInPlace.first())
+    }
 }
